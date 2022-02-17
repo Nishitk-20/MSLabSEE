@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms063-nginx-deployment
+  labels:
+    app: ms063-nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ms063-nginx
+  template:
+    metadata:
+      labels:
+        app: ms063-nginx
+    spec:
+      containers:
+      - name: nginx
+        image: 172.1.14.168:5001/nginx
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 80
+
+
+
+Q1 & Q2-
+kubectl apply -f deaf.yml
+kubectl get pods| grep ms063
+kubectl expose deployment ms063-nginx-deployment --type=NodePort --name=ms063-nginx-service
+kubectl get svc | grep ms063
+kubectl port-forward deployment/ms063-nginx-deployment 8081:30168
+kubectl set image deployment/ms063-nginx-deployment nginx=newimage
+kubectl describe deploy ms063-nginx-deployment| grep Image:
+
+Q3-
+kubectl run ms063-nginx1 --image=nginx --restart=Never --labels=app=ms063-v1
+kubectl run ms063-nginx2 --image=nginx --restart=Never --labels=app=ms063-v1
+kubectl run ms063-nginx3 --image=nginx --restart=Never --labels=app=ms063-v1
+
+kubectl get po --show-labels
+kubectl get po -l app=ms063-v1
+kubectl label po ms063-nginx1 ms063-nginx2 ms063-nginx3 app-
+
+
+Q4-
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu
+  labels:
+    app: ubuntu
+spec:
+  containers:
+  - name: ubuntu
+    image: 172.1.14.168:5001/ubuntu
+    command: ["/bin/bash"]
+    args: ["-c","echo MSRIT"]
+
+kubectl apply -f dep_ubuntu_pod1.yaml
+kubectl logs ubuntu
+kubectl delete pod ubuntu
+
+Q5-
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu
+  labels:
+    app: ubuntu
+spec:
+  containers:
+  - name: ubuntu
+    image: 172.1.14.168:5001/ubuntu
+    env:
+     - name: MESSAGE
+       value: "MSRIT"
+    command: ["/bin/bash"]
+    args: ["$(MESSAGE)"]
+
+
+kubectl apply -f dep_ubuntu_pod.yaml
+kubectl logs ubuntu
+kubectl delete pod ubuntu
+
+
